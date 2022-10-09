@@ -1,4 +1,3 @@
-# 读取Properties文件类
 class Properties:
     def __init__(self, file_name):
         self.file_name = file_name

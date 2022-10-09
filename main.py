@@ -40,6 +40,14 @@ if os.path.isfile('config.properties'):
         LogFileName=eval(config['LogFileName'])
     except:
         LogFileName='log-'+dt+'.txt'
+    try:
+        DefaltPrec=eval(config['DefaltPrec'])
+    except:
+        DefaltPrec=decimal.MAX_PREC
+    try:
+        LittlePrec=eval(config['LittlePrec'])
+    except:
+        LittlePrec=256
 else:
     history_enabled=bool('True')
     log_enabled=bool('True')
@@ -47,6 +55,8 @@ else:
     LogDir='files\\logs\\'
     HistoryName='history.txt'
     LogFileName='log-'+dt+'.txt'
+    DefaltPrec=decimal.MAX_PREC
+    LittlePrec=256
 if history_enabled==True:
     if not os.path.isdir(HistoryDir)==True:
         os.mkdir(HistoryDir)
@@ -54,7 +64,6 @@ if log_enabled==True:
     if not os.path.isdir(LogDir)==True:
         if not HistoryDir==LogDir:
             os.mkdir(LogDir)
-decimal.getcontext().prec=2147483647
 calc = wx.App()
 iconcalc = wx.Icon(name="files\\calc.ico",type=wx.BITMAP_TYPE_ICO)
 iconclk = wx.Icon("files\\clock32.png", type=wx.BITMAP_TYPE_PNG)
@@ -80,7 +89,7 @@ m1e.SetMaxLength(0)
 m2e.SetMaxLength(0)
 rese.SetMaxLength(0)
 te.SetMaxLength(0)
-frm=wx.Frame(None, title = 'History', size = (655, 677),style=wx.DEFAULT_FRAME_STYLE^(wx.CLOSE_BOX|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER))
+frm=wx.Frame(calcgui, title = 'History', size = (655, 677),style=wx.DEFAULT_FRAME_STYLE^(wx.CLOSE_BOX|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER))
 frm.SetIcon(iconclk)
 Control = wx.TextCtrl(frm, -1, size=(640, 500), style = wx.TE_MULTILINE)
 Control.SetMaxLength(0)
@@ -103,6 +112,8 @@ def refresh(self):
         hstr.close()
         Control.SetValue(str(txhs))
 def calculation(self=None):
+    global DefaltPrec,LittlePrec
+    decimal.getcontext().prec=int(DefaltPrec)
     if log_enabled==True:
         test_log = logging.FileHandler(LogDir+LogFileName,'a',encoding='utf-8')
         logger = logging.getLogger('test_logger')
@@ -118,9 +129,11 @@ def calculation(self=None):
         if sy=="+" or sy=="-" or sy=="*" or sy=="/" or sy=="<" or sy==">" or sy=="=" or sy=="//" or sy=="%" or sy=="":
             result=str(decimal.Decimal(eval('decimal.Decimal(m1)'+sy+'decimal.Decimal(m2)')))
         elif sy=="^" or sy=="**":
-            result=str(decimal.Decimal(eval("decimal.Decimal(m1)**decimal.Decimal(m2)")))
+            decimal.getcontext().prec=int(LittlePrec)
+            result=str(decimal.Decimal(eval("decimal.Decimal(decimal.Decimal(m1)**decimal.Decimal(m2))")))
         elif sy=="√":
-            result=str(decimal.Decimal(eval("pow(decimal.Decimal(m1),1/decimal.Decimal(m2))")))
+            decimal.getcontext().prec=int(LittlePrec)
+            result=str(decimal.Decimal(eval('decimal.Decimal(decimal.Decimal(m2)**(decimal.Decimal(1)/decimal.Decimal(m1)))')))
         elif sy=='sin' or sy=='cos' or sy=='tan' or sy=='radians' or sy=='degrees':
             result=str(decimal.Decimal(eval(sy+'(radians(decimal.Decimal('+m2+')))')))
         elif sy=='version':

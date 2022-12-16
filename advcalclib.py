@@ -7,9 +7,8 @@ PI = decimal.Decimal('3.14159264621354228214934443198269577431443722334560279455
     
 
 # 将算式从字符串处理成列表，解决横杠是负号还是减号的问题
-def formula_format(formula,prec=1024):
-    global PI, E
-    decimal.getcontext().prec = prec % decimal.MAX_PREC
+def formula_format(formula):
+    
     """
     解释参数类型
     :param formula: str
@@ -165,8 +164,9 @@ def gaojie(op_stack, num_stack):  # 运算符栈，数字栈
 
 
 # 负责遍历算式列表中的字符，决定压入数字栈中或压入运算符栈中或弹栈运算
-def final_calc(formula_list):
-    global  PI,E
+def final_calc(formula_list,prec=1024):
+    global PI, E
+    decimal.getcontext().prec = prec % decimal.MAX_PREC
     """
     :param formula_list: 算式列表
     :return: 计算结果
